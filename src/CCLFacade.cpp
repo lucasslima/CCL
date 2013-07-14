@@ -6,12 +6,13 @@
  */
 #include <cstdio>
 CCL::CCL() {
-	available_threads = 64;
+	available_threads = sysconf( _SC_NPROCESSORS_ONLN );;
 	ccl_thread = new pthread_t[available_threads];
 	current_thread = 0;
 	user_function = new void*[64];
 	function_counter = 0;
 	function_arguments = new void*[64];
+	results.clear();
 }
 
 template <class F>
@@ -48,7 +49,7 @@ void CCL::execute(F &function){
 }
 
 template <class F,class A >
-void CCL::execute(F &function, A &arg){
+Ticket CCL::execute(F &function, A &arg){
 	Carrier * carrier = new Carrier;
 	carrier->context = this;
 	carrier->function_pos = this->function_counter;
